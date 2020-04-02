@@ -5,9 +5,10 @@ import BigNumber from 'bignumber.js';
 import MarketWatch from '../components/MarketWatch';
 import MARKET_WATCH from '../components/MarketWatch/utils';
 import { IState, IThunkAction } from '../redux/reducers';
+import { cancelRequest } from '../redux/reducers/request/actions';
 import { fetchInstruments } from '../redux/reducers/staticData/actions';
 import { subscribe, unsubscribe } from '../redux/reducers/streams/actions';
-import { getIsConnectedByStream, getIsConnectingByStream } from '../redux/reducers/streams/selectors';
+import { getErrorByStream, getIsConnectedByStream, getIsConnectingByStream } from '../redux/reducers/streams/selectors';
 
 const getMarketWatchData = createSelector<
 IState,
@@ -64,6 +65,13 @@ const onSubscribe = (): IThunkAction => (dispatch, getState) => {
   }
 };
 
+const onUnsubscribe = (): IThunkAction => (dispatch, getState) => {
+  const state = getState();
+
+  dispatch(cancelRequest({ requestId: state.staticData.instruments.requestId }));
+  dispatch(unsubscribe({ stream: MARKET_WATCH.STREAM_NAME }));
+};
+
 const mapStateToProps = (state: IState) => {
   const {
     staticData: { instruments },
@@ -71,7 +79,7 @@ const mapStateToProps = (state: IState) => {
 
   return ({
     isFetching: instruments.isFetching || getIsConnectingByStream(state, { stream: MARKET_WATCH.STREAM_NAME }),
-    hasError: !!instruments.error,
+    hasError: !!instruments.error || getErrorByStream(state,{ stream: MARKET_WATCH.STREAM_NAME }),
     data: getMarketWatchData(state),
     alts: instruments.altsMarket,
     fiat: instruments.fiatMarket,
@@ -80,7 +88,7 @@ const mapStateToProps = (state: IState) => {
 
 const mapDispatchToProps = {
   onSubscribe,
-  onUnsubscribe: () => unsubscribe({ stream: MARKET_WATCH.STREAM_NAME }),
+  onUnsubscribe,
 };
 
 const MarketWatchContainer = connect(mapStateToProps, mapDispatchToProps)(MarketWatch);

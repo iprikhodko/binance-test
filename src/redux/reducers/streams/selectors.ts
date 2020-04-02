@@ -9,6 +9,7 @@ export const getStreamByStreamName = createSelector<IState, { stream: string }, 
     isConnecting: false,
     isConnected: false,
     subscribersCount: 0,
+    error: null,
   }
 );
 
@@ -27,4 +28,10 @@ export const getIsConnectedByStream = createSelector<IState, { stream: string },
   // @ts-ignore
   getStreamByStreamName,
   stream => stream.isConnected,
+);
+
+export const getErrorByStream = createSelector<IState, { stream: string }, ReturnType<typeof getStreamByStreamName>, number>(
+  // @ts-ignore
+  getStreamByStreamName,
+  stream => stream.error,
 );

@@ -5,6 +5,7 @@ export const ACTIONS = {
   CONNECTING: 'stream/CONNECTING',
   CONNECTED: 'stream/CONNECTED',
   SUBSCRIBE: 'stream/SUBSCRIBE',
+  ERROR: 'stream/ERROR',
   UPDATE_DATA: 'stream/UPDATE_DATA',
   UNSUBSCRIBE: 'stream/UNSUBSCRIBE',
   DISCONNECTED: 'stream/DISCONNECTED',
@@ -47,6 +48,12 @@ export type IUpdateDataAction = {
 };
 export const updateData = createAction<IUpdateDataAction['payload']>(ACTIONS.UPDATE_DATA);
 
+export type IErrorAction = {
+  type: typeof ACTIONS.ERROR;
+  payload: ICommonPayload;
+};
+export const handleError = createAction<IErrorAction['payload']>(ACTIONS.ERROR);
+
 export type IUnsubscribeAction = {
   type: typeof ACTIONS.UNSUBSCRIBE;
   payload: ICommonPayload;
@@ -68,6 +75,7 @@ export const imitateServerClosing = createAction<IImitateServerClosingAction['pa
 export type AllStreamActions = IConnectingStreamAction |
   IConnectedStreamAction |
   ISubscribeAction |
+  IErrorAction |
   IUpdateDataAction |
   IUnsubscribeAction |
   IDisconnectedAction |

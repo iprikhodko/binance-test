@@ -5,6 +5,8 @@ interface IStream {
   subscribersCount: number;
   isConnecting: boolean;
   isConnected: boolean;
+  // keep not boolean name in case we could pass something readable
+  error: boolean;
 }
 
 export interface IStreamState {
@@ -37,6 +39,7 @@ const getStreamState = (state: IStreamState, action: ICommonStreamAction): IStre
     isConnecting: false,
     isConnected: false,
     subscribersCount: 0,
+    error: false,
   };
 };
 
@@ -101,6 +104,21 @@ const streamsReducer = (state: IStreamState = initialStreamState, action: AllStr
         },
       };
     }
+    case ACTIONS.ERROR: {
+      const { stream } = action.payload;
+      const streamState = getStreamState(state, action);
+
+      return {
+        ...state,
+        streams: {
+          ...state.streams,
+          [stream]: {
+            ...streamState,
+            error: true,
+          },
+        },
+      };
+    }
     case ACTIONS.SUBSCRIBE: {
       const { stream } = action.payload;
       const streamState = getStreamState(state, action);
@@ -145,6 +163,7 @@ const streamsReducer = (state: IStreamState = initialStreamState, action: AllStr
             isConnecting: false,
             isConnected: false,
             subscribersCount: 0,
+            error: false,
           },
         },
       };

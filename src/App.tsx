@@ -9,6 +9,7 @@ import LanguageSelectContainer from './containers/LanguageSelect';
 import MarketWatchContainer from './containers/MarketWatch';
 import ThemeSwitcherContainer from './containers/ThemeSwitcher';
 import { IState } from './redux/reducers';
+import { ACTIONS as STATIC_DATA_ACTIONS } from './redux/reducers/staticData/actions';
 import { imitateServerClosing } from './redux/reducers/streams/actions';
 
 const Container = styled.div`
@@ -37,8 +38,12 @@ const SettingsLabel = styled.div`
 
 const SettingsValue = styled.div``;
 
-const App: FC<{ theme: string; disconnect: () => void }> = props => {
-  const { theme, disconnect } = props;
+const App: FC<{
+  theme: string;
+  onDisconnect: () => void;
+  onImitateError: () => void;
+}> = props => {
+  const { theme, onDisconnect, onImitateError } = props;
   const [isHidden, setIsHidden] = useState<boolean>(false);
   const onComponentToggle = useCallback(() => setIsHidden(prevIsHidden => !prevIsHidden), []);
 
@@ -65,8 +70,15 @@ const App: FC<{ theme: string; disconnect: () => void }> = props => {
             </SettingsValue>
           </SettingsItem>
           <SettingsItem>
-            <button onClick={disconnect}>
+            <button onClick={onDisconnect}>
               <Trans>Imitate disconnection</Trans>
+            </button>
+          </SettingsItem>
+          <SettingsItem>
+            <button onClick={onImitateError}>
+              <Trans>
+                Imitate error
+              </Trans>
             </button>
           </SettingsItem>
           <SettingsItem>
@@ -88,7 +100,13 @@ const mapStateToProps = (state: IState) => ({
 });
 
 const mapDispatchToProps = {
-  disconnect: () => imitateServerClosing({ stream: MARKET_WATCH.STREAM_NAME }),
+  onDisconnect: () => imitateServerClosing({ stream: MARKET_WATCH.STREAM_NAME }),
+  onImitateError: () => ({
+    type: STATIC_DATA_ACTIONS.FETCH_INSTRUMENTS_ERROR,
+    payload: {
+      error: {},
+    },
+  }),
 };
 
 const AppContainer = connect(mapStateToProps, mapDispatchToProps)(App);

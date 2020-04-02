@@ -1,6 +1,13 @@
 import { Dispatch, Middleware } from 'redux';
 import { IState } from '../index';
-import { ACTIONS, AllStreamActions, connecting, connected, disconnected, updateData } from './actions';
+import {
+  ACTIONS,
+  AllStreamActions,
+  connecting,
+  connected,
+  disconnected,
+  updateData,
+} from './actions';
 import { getSubscribersCountByStream } from './selectors';
 import { STREAM_GROUPS } from './types';
 
@@ -9,13 +16,20 @@ const websockets: {
 } = {};
 
 const STREAMS_REGEXP = {
-  MINI_TICKER_ARR: /!miniTicker@arr/
-};
+  MINI_TICKER_ARR: /!miniTicker@arr/,
+} as const;
 
 const WS_CODES = {
   CLOSE_NORMAL: 1000,
   ABNORMAL: 1006,
   IMITATE_SERVER_CLOSING: 4500,
+};
+
+const WS_STATES = {
+  CONNECTING: 0,
+  OPEN: 1,
+  CLOSING: 2,
+  CLOSED: 3,
 };
 
 const openStreamConnection = ({
@@ -34,6 +48,12 @@ const openStreamConnection = ({
   ws.addEventListener('open', () => dispatch(connected({ stream })));
 
   ws.addEventListener('close', ({ code }) => {
+    const currOrigin = websockets[stream];
+
+    if (ws !== currOrigin) {
+      return;
+    }
+
     delete websockets[stream];
 
     if ([WS_CODES.CLOSE_NORMAL, WS_CODES.ABNORMAL].includes(code)) {
@@ -77,7 +97,6 @@ const closeStreamConnection = ({
     return;
   }
 
-  delete websockets[stream];
   ws.close(code);
 };
 
@@ -86,8 +105,9 @@ const streamsMiddleware: Middleware<any, IState> = store => next => (action: All
 
   if (action.type === ACTIONS.SUBSCRIBE) {
     const { stream } = action.payload;
+    const ws = websockets[stream];
 
-    if (!websockets[stream]) {
+    if (!ws || ([WS_STATES.CLOSING, WS_STATES.CLOSED]).includes(ws.readyState)) {
       openStreamConnection({ stream, dispatch });
     }
   } else if (action.type === ACTIONS.UNSUBSCRIBE) {

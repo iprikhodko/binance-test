@@ -242,9 +242,9 @@ class MarketWatch extends PureComponent<IMarketWatchProps, IMarketWatchState> {
 
   // ToDo add memoization
   getPreparedData = () => {
-    const { data, isFetching } = this.props;
+    const { data, isFetching, hasError } = this.props;
 
-    if (isFetching) {
+    if (isFetching || hasError) {
       return [];
     }
 
@@ -352,7 +352,7 @@ class MarketWatch extends PureComponent<IMarketWatchProps, IMarketWatchState> {
   };
 
   render() {
-    const { isFetching } = this.props;
+    const { isFetching, hasError, onSubscribe } = this.props;
     const {
       search,
       category,
@@ -464,8 +464,10 @@ class MarketWatch extends PureComponent<IMarketWatchProps, IMarketWatchState> {
         <Body>
           <Table
             data={data}
-            favorites={favorites}
             isFetching={isFetching}
+            hasError={hasError}
+            onFetch={onSubscribe}
+            favorites={favorites}
             isVolumeShown={isVolumeShown}
             sortBy={sortBy}
             sortOrder={sortOrder}

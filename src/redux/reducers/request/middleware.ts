@@ -13,6 +13,7 @@ const requestMiddleware: Middleware<any, IState> = store => next => (action: IAl
     const { dispatch } = store;
     const { config, actions } = action.payload;
     const requestId = shortid.generate();
+    const source = axios.CancelToken.source();
 
     dispatch({
       type: actions.pending,
@@ -21,7 +22,10 @@ const requestMiddleware: Middleware<any, IState> = store => next => (action: IAl
       },
     });
 
-    axios(config).then(
+    axios({
+      ...config,
+      cancelToken: source.token,
+    }).then(
       ({ data }) => {
         delete requests[requestId];
         dispatch({
@@ -44,10 +48,15 @@ const requestMiddleware: Middleware<any, IState> = store => next => (action: IAl
       },
     );
 
-    // ToDo implement cancel function
-    requests[requestId] = () => {};
+    requests[requestId] = source.cancel;
+
   } else if (action.type === ACTIONS.CANCEL_REQUEST) {
-    // ToDo handle cancel action
+    const { requestId } = action.payload;
+    const cancel = requests[requestId || ''];
+
+    if (cancel) {
+      cancel();
+    }
   }
 
   return next(action);

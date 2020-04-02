@@ -1,6 +1,6 @@
 import { applyMiddleware, createStore } from 'redux';
 import thunk from 'redux-thunk';
-import requestMiddleware from './reducers/request/request';
+import requestMiddleware from './reducers/request/middleware';
 import streamsMiddleware from './reducers/streams/middleware';
 import mainReducer from './reducers';
 

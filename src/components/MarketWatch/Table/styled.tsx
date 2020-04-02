@@ -63,9 +63,15 @@ export const ChangeCell = styled(BodyCell)<{
 
 export const EmptyRow = styled.div`
   color: ${THEMES.TEXT_SECONDARY};
-  display: flex;
-  justify-content: center;
   padding: 10px;
+  text-align: center;
+`;
+
+export const RetryButton = styled.button.attrs(() => ({ type: 'button' }))`
+  display: inline-block;
+  margin-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
 `;
 
 export const SpinnerWrapper = styled.div`

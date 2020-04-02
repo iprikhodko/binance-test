@@ -25,8 +25,11 @@ export const makeRequest = createAction<IMakeRequestAction['payload']>(ACTIONS.M
 
 export type ICancelRequestAction = {
   type: typeof ACTIONS.CANCEL_REQUEST,
-  payload: ICommonPayload;
+  payload: {
+    requestId?: string | null;
+  };
 };
+export const cancelRequest = createAction<ICancelRequestAction['payload']>(ACTIONS.CANCEL_REQUEST);
 
 export type IRequestPendingAction<A extends string> = {
   type: A,

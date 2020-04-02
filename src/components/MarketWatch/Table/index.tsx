@@ -9,6 +9,7 @@ import HeadCell from './HeadCell';
 import {
   Container,
   EmptyRow,
+  RetryButton,
   BodyCell,
   InstrumentName,
   InstrumentMarginLeverage,
@@ -30,11 +31,13 @@ type IDataItem = {
 
 interface IMarketWatchTableProps {
   data: IDataItem[];
+  isFetching: boolean;
+  hasError: boolean;
+  onFetch: () => void;
   favorites: string[];
   isVolumeShown: boolean;
   sortBy?: string;
   sortOrder: typeof MARKET_WATCH.SORT[keyof typeof MARKET_WATCH.SORT];
-  isFetching: boolean;
   onSort: ComponentProps<typeof HeadCell>['onSort'];
   onFavoriteToggle: ComponentProps<typeof FavoriteCell>['onToggle'];
 }
@@ -97,13 +100,30 @@ class MarketWatchTable extends PureComponent<IMarketWatchTableProps> {
   rowGetter = ({ index }: { index: number }) => this.props.data[index];
 
   noRowsRenderer = () => {
-    const { isFetching } = this.props;
+    const { isFetching, hasError, onFetch } = this.props;
 
     if (isFetching) {
       return (
         <SpinnerWrapper>
           <Spinner />
         </SpinnerWrapper>
+      );
+    }
+
+    if (hasError) {
+      return (
+        <EmptyRow>
+          <div>
+            <Trans>
+              Something went wrong
+            </Trans>
+          </div>
+          <RetryButton onClick={onFetch}>
+            <Trans>
+              Try again
+            </Trans>
+          </RetryButton>
+        </EmptyRow>
       );
     }
 
