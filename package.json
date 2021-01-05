@@ -20,7 +20,7 @@
     "@types/shortid": "0.0.29",
     "@types/styled-components": "^5.0.1",
     "@types/styled-theming": "^2.2.2",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "bignumber.js": "^9.0.0",
     "i18next": "^19.3.4",
     "react": "^16.13.1",
